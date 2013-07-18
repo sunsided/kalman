@@ -1,4 +1,4 @@
-%% Beispiel f¸r das Kalman-Filter im vierdimensionalen Fall
+%% Beispiel f√ºr das Kalman-Filter im vierdimensionalen Fall
 % In diesem Beispiel sind die Eingangswerte des Filters bekannt und
 % werden nicht als Systemzustand modelliert. Kalman-Filter und 
 % Systemmodell verwenden identische Matrizen A und B.
@@ -11,7 +11,7 @@ Tend = 1.5;          % Endzeit in [s]
 t = 0:dt:Tend-dt;    % Zeitvektor [s]
 N = length(t);
   
-%% Durchf¸hrung der Simulation
+%% Durchf√ºhrung der Simulation
 
 % Systemparameter
 ax = -1;            % Beschleunigung in x-Richtung [m/s^2]
@@ -29,7 +29,7 @@ x0 = [px0;           % Initiale x-Position
      vx0;           % Initiale x-Geschwindigkeit
      vy0];          % Initiale y-Geschwindigkeit
  
-% Zeitkontinuierliche System¸bergangsmatrix
+% Zeitkontinuierliche System√ºbergangsmatrix
 A = [0, 0, dt,  0;    % Geschwindigkeit in x-Richtung
      0, 0,  0, dt;    % Geschwindigkeit in y-Richtung
      0, 0,  0,  0;    % Beschleunigung in x-Richtung
@@ -42,7 +42,7 @@ B = [0.5*dt^2,        0;    % Einfluss von Eingangswert auf x-Geschwindigkeit
             0,      dt];    % Einfluss von Eingangswert auf y-Beschleunigung
 
 % Ausgangsmatrix
-C = [1, 0, 0, 0;    % Ausgang ist Identit‰t des Zustandes
+C = [1, 0, 0, 0;    % Ausgang ist Identit√§t des Zustandes
      0, 1, 0, 0;
      0, 0, 1, 0;
      0, 0, 0, 1];
@@ -87,7 +87,7 @@ ddt = 0.005;           % Abtastzeit in [s]
 dt = 0:ddt:Tend-ddt;    % Zeitvektor [s]
 dN = length(dt);
 
-% Diskretisierung der Zustands¸bergangsmatrix
+% Diskretisierung der Zustands√ºbergangsmatrix
 Ad = [1, 0, ddt,   0;     % x = x0 + vx*dt + ...
       0, 1,   0, ddt;     % y = y0 + vy*dt + ...
       0, 0,   1,   0;     % vx = vx0
@@ -134,22 +134,22 @@ v = sqrt(vmess)*randn(2, dN);       % Messrauschen [m]
 % Virtueller Messwertvektor
 messungen = dx_results(1:2, :) + v;
 
-% Mess¸bergangsmatrix
-H = [1, 0, 0, 0;            % ‹bergang von Zustandsvektor in x-Messung
-     0, 1, 0, 0];           % ‹bergang von Zustandsvektor in y-Messung
+% Mess√ºbergangsmatrix
+H = [1, 0, 0, 0;            % √úbergang von Zustandsvektor in x-Messung
+     0, 1, 0, 0];           % √úbergang von Zustandsvektor in y-Messung
  
 % Messunsicherheit / Messkovarianzmatrix
 R = [vmess, 0;
          0, vmess];
 
-% Unsicherheit der Eing‰nge (Kovarianz des Prozessrauschens)
+% Unsicherheit der Eing√§nge (Kovarianz des Prozessrauschens)
 Q = [10E-5, 0;
      0, 10E-5];
      
 % Konvergenzfaktor
 lambda = 0.999;
 
-% Initialisierung der Zustandssch‰tzung
+% Initialisierung der Zustandssch√§tzung
 x = [0;                     % Position in x-Richtung [m]
      0;                     % Position in y-Richtung [m]
      1;                     % Geschwindigkeit in x-Richtung [m/s]
@@ -161,25 +161,25 @@ P = [10, 0, 0, 0;
      0, 0, 10, 0;
      0, 0, 0, 10];
 
-% Identit‰tsmatrix
+% Identit√§tsmatrix
 I = eye(size(P));
   
 % Ergebnisvektor
 kx_results = zeros(length(x), length(dt));
 kx_results(:, 1) = x;
  
-% Schleife beginnt mit einer a-priori-Sch‰tzung,
-% da der Initialzustand bereits eine a-posteriori-Sch‰tzung ist.
+% Schleife beginnt mit einer a-priori-Sch√§tzung,
+% da der Initialzustand bereits eine a-posteriori-Sch√§tzung ist.
 x_pos = x;
 P_pos = P;
 clearvars x P A B D N;
 
 % Iterieren
 for i=1:dN        
-    % Pr‰diktion des Systemzustandes
+    % Pr√§diktion des Systemzustandes
     x_pri = Ad*x_pos + Bd*u;
     
-    % Pr‰diktion der Systemkovarianz
+    % Pr√§diktion der Systemkovarianz
     P_pri = Ad*P_pos*Ad' * 1/(lambda^2) + Bd*Q*Bd';
 
     % Messung beziehen
@@ -192,7 +192,7 @@ for i=1:dN
     % Ermittlung des Kalman-Gains
     K = P_pri * H' / S;
 
-    % Korrektur der Sch‰tzung mittels Messwert
+    % Korrektur der Sch√§tzung mittels Messwert
     x_pos = x_pri + K*w;
 
     % Korrektur der Kovarianzmatrix mittels Messwert
