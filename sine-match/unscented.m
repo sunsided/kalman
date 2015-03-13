@@ -1,4 +1,4 @@
-function [my, sigma] = unscented(fun, my, sigma, varargin)
+function [my, sigma, Y, wm, wc] = unscented(fun, my, sigma, varargin)
     % scaled unscented transform with 2*n+1 sigma points
 
     % enforce the canonical row vector
@@ -57,16 +57,20 @@ function [my, sigma] = unscented(fun, my, sigma, varargin)
     % calculate weights for covariance determination
     wc0 = wm0 + (1 - alpha^2 + beta);
     wci = wmi;
+
+    % bundle for output
+    wm = [wm0, wci*ones(1,2*n)];
+    wc = [wc0, wci*ones(1,2*n)];
     
     % calculate the new expectation
-    my = wm0*Y(:,1);
-    for i=2:2*n+1
-        my = my + wmi*Y(:,i);
+    my = 0;
+    for i=1:2*n+1
+        my = my + wm(i)*Y(:,i);
     end
     
     % calculate the new covariance
-    sigma = wc0*(Y(:,1)-my)*(Y(:,1)-my)';
-    for i=2:2*n+1
-        sigma = sigma + wci*(Y(:,i)-my)*(Y(:,i)-my)';
+    sigma = zeros(size(sigma));
+    for i=1:2*n+1
+        sigma = sigma + wc(i)*(Y(:,i)-my)*(Y(:,i)-my)';
     end
 end
