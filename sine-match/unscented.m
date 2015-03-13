@@ -1,19 +1,35 @@
-function [my, sigma] = unscented(fun, my, sigma)
+function [my, sigma] = unscented(fun, my, sigma, varargin)
     % scaled unscented transform with 2*n+1 sigma points
 
     % enforce the canonical row vector
     if isrow(my)
         my = my';
     end
+
+    % default values
+    % http://ais.informatik.uni-freiburg.de/teaching/ws12/mapping/pdf/slam05-ukf.pdf
+    % http://ei.uni-paderborn.de/fileadmin/Elektrotechnik/FG-NTH/http/download/estimation.pdf
+    defaultKappa = 1;
+    defaultAlpha = 1; % 1e-3 is typical, 1 results in regular unscented transform
+    defaultBeta = 2;
+    
+    % parse inputs
+    p = inputParser;
+    addRequired(p, 'fun', @(fh) isa(fh,'function_handle'));
+    addRequired(p, 'my', @isvector);
+    addRequired(p, 'sigma', @ismatrix);
+    addOptional(p, 'kappa', defaultKappa, @isnumeric);
+    addOptional(p, 'alpha', defaultAlpha, @isnumeric);
+    addOptional(p, 'beta', defaultBeta, @isnumeric);
+    parse(p, fun, my, sigma, varargin{:});   
     
     % obtain the number of states
     n = numel(my);
 
     % determine free parameters
-    % http://ais.informatik.uni-freiburg.de/teaching/ws12/mapping/pdf/slam05-ukf.pdf
-    kappa = 1;
-    alpha = 1; % 1e-3;
-    beta = 2;
+    kappa = p.Results.kappa;
+    alpha = p.Results.alpha;
+    beta = p.Results.beta;
     lambda = alpha^2*(n+kappa) - n;
 
     % calculate matrix square root of adjusted covariance matrix
