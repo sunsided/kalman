@@ -56,9 +56,13 @@ for i=1:numel(time_vector);
     % time update - propagate state
     [x_priori, P_priori, X, Xwm, Xwc] = unscented(state_transition_fun, x, P, 'n_out', 4);
     
+% TODO: add prediction noise R_t to P_priori
+    
     % determine what we should observe
     [y, Py, Y, Ywm, Ywc] = unscented(observation_fun, x_priori, P_priori, 'n_out', 1);
-        
+    
+% TODO: add measurement noise Q_t to Sy
+    
     % calculate cross-covariance
     Pxy = zeros(size(P));
     for j=1:numel(Ywc)
