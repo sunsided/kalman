@@ -2,6 +2,10 @@
 
 Example usage and test cases for the Kalman Filter.
 
+Current implementations are:
+* Regular Kalman Filter (Joseph form gain)
+* Scaled Unscented Kalman Filter
+
 ## License
 
 Copyright &copy; 2013 Markus Mayer
