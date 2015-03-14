@@ -53,7 +53,9 @@ z_sigma = 0.05;
 Q = ones(size(1))*z_sigma;
 
 % simulate
-for i=1:numel(time_vector);
+h = waitbar(0, 'Simulating ...');
+for i=1:N_samples;
+   
     % obtain current time and time delta to last step
     t = time_vector(i);
     if i > 1
@@ -76,7 +78,7 @@ for i=1:numel(time_vector);
                                             
     % add prediction noise
     P_prior = P_prior + R;
-    
+        
     % predict observations using the a-priori state
     % Note that the weights calculated by this function are the very
     % same as calculated above since we're still operating on 
@@ -117,7 +119,14 @@ for i=1:numel(time_vector);
         x = x_posterior;
         P = P_posterior;
     end
- end
+    
+    % update the progress bar
+    waitbar(i / N_samples, h);
+    
+end
+
+% remove the progress bar
+delete(h); 
 
 % plot the estimated data
 hold all;
