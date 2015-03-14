@@ -84,7 +84,7 @@ for i=1:numel(time_vector);
     
     % measurement update
     x_posterior = x_prior + K*(z - z_estimate);
-    P_posterior = P_prior + K*S_estimate*K';
+    P_posterior = P_prior - K*S_estimate*K';
     
     % pass variables around
     x = x_posterior;
