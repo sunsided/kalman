@@ -14,7 +14,8 @@ time_vector = linspace(T_start, T_end, N_samples);
 real_omega = 2*pi*real_frequency;
 real_data = real_amplitude*sin(real_omega*time_vector+real_phase) + real_offset;
 
-% generate the output buffer
+% generate the output buffers
+observed_data = nan(size(real_data));
 estimated_data = nan(size(real_data));
 
 % plot the real data
@@ -40,7 +41,7 @@ x = [1;  % frequency [Hz]
 P = 1000*diag(ones(size(x)));
  
 % define additive state covariance prediction noise
-R = (1)^2 * ...
+R = 0 * ...
     [1 0 0   0;     % frequency may change over time
      0 1 0   0;     % phase may change over time
      0 0 0.01 0;     % amplitude does not change
@@ -110,6 +111,7 @@ for i=1:numel(time_vector);
 
         % pass variables around
         estimated_data(i) = z_estimate;
+        observed_data(i) = z;
         x = x_posterior;
         P = P_posterior;
     end
@@ -119,3 +121,4 @@ for i=1:numel(time_vector);
 hold all;
 valid = ~isnan(estimated_data);
 plot(time_vector(valid), estimated_data(valid), 'r');
+plot(time_vector(valid), observed_data(valid), 'm+');
