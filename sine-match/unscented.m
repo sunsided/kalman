@@ -50,7 +50,7 @@ function [my, sigma, Y, wm, wc] = unscented(fun, my, sigma, varargin)
         X(:,i+n+1) = my - S_adjusted(:,i);
     end
     
-    % prepare the array for the sigma points. 
+    % prepare the array for the transformed sigma points. 
     % Since we can't determine it from the state vector alone (the 
     % evaluation function might return a vector of any dimension) we use
     % the hint given in the function call or fall back to a dynamically 
