@@ -74,7 +74,7 @@ for i=1:numel(time_vector);
     Pxy = zeros(numel(x), numel(z));
     for j=1:numel(Ywc)
         % TODO: there be dragons
-        Pxy = Pxy + Zwc(j)*(X(:,i)-x_prior)*(S(:,i)-z)';
+        Pxy = Pxy + Xwc(j)*(X(:,j)-x_prior)*(Z(:,j)-z_estimate)';
     end
     
 end
