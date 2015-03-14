@@ -16,15 +16,15 @@ real_data = real_amplitude*sin(real_omega*time_vector+real_phase) + real_offset;
 
 % plot the real data
 close all;
-plot(t, real_data);
+plot(time_vector, real_data);
 xlabel('t [s]');
 ylabel('a*sin(\omegat+\phi)+b');
 
 % "it it is easier to approximate
 %  a probability distribution than it is to approximate
 %  an arbitrary nonlinear function or transformation"
-% J. K. Uhlmann, “Simultaneous map building and localization for
-% real time applications,” transfer thesis, Univ. Oxford, Oxford, U.K.,
+% J. K. Uhlmann, ï¿½Simultaneous map building and localization for
+% real time applications,ï¿½ transfer thesis, Univ. Oxford, Oxford, U.K.,
 % 1994.
 
 % set initial state estimate
