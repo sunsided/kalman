@@ -54,10 +54,10 @@ for i=1:numel(time_vector);
     observation_fun = @(x) x(3)*sin(2*pi*x(1)*T+x(2))+x(4);
     
     % time update - propagate state
-    [x_priori, P_priori, X, Xwm, Xwc] = unscented(state_transition_fun, x, P);
+    [x_priori, P_priori, X, Xwm, Xwc] = unscented(state_transition_fun, x, P, 'n_out', 4);
     
     % determine what we should observe
-    [y, Py, Y, Ywm, Ywc] = unscented(observation_fun, x_priori, P_priori);
+    [y, Py, Y, Ywm, Ywc] = unscented(observation_fun, x_priori, P_priori, 'n_out', 1);
         
     % calculate cross-covariance
     Pxy = zeros(size(P));
