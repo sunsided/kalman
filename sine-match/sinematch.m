@@ -73,7 +73,6 @@ for i=1:numel(time_vector);
     % calculate state-observation cross-covariance
     Pxy = zeros(numel(x), numel(z));
     for j=1:numel(Xwc)
-        % TODO: there be dragons
         Pxy = Pxy + Xwc(j)*(X(:,j)-x_prior)*(Z(:,j)-z_estimate)';
     end
     
