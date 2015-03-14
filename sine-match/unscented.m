@@ -85,7 +85,7 @@ function [my, sigma, Y, wm, wc] = unscented(fun, my, sigma, varargin)
     end
     
     % calculate the new covariance
-    sigma = zeros(size(sigma));
+    sigma = zeros(numel(my), numel(my));
     for i=1:2*n+1
         sigma = sigma + wc(i)*(Y(:,i)-my)*(Y(:,i)-my)';
     end
