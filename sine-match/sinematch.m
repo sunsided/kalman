@@ -36,6 +36,12 @@ x = [1;  % frequency [Hz]
 % set initial state covariance
 P = 1000*diag(ones(size(x)));
  
+% define additive state covariance prediction noise
+R = ones(size(P_prior))*0.1;
+
+% define additive measurement covariance prediction noise
+Q = ones(size(1))*0.1;
+
 % simulate
 for i=1:numel(time_vector);
     % obtain current time and time delta to last step
@@ -57,8 +63,9 @@ for i=1:numel(time_vector);
     [x_prior, P_prior, X, Xwm, Xwc] = unscented(state_transition_fun, ...
                                                 x, P, ...
                                                 'n_out', 4);
-    
-% TODO: add prediction noise R_t to P_prior
+                                              
+    % add prediction noise
+    P_prior = P_prior + R;
     
     % predict observations using the a-priori state
     % Note that the weights calculated by this function are the very
@@ -68,8 +75,9 @@ for i=1:numel(time_vector);
                                             x_prior, P_prior, ...
                                             'n_out', 1);
     
-% TODO: add measurement noise Q_t to Sy
-    
+    % add measurement noise Q to S_estimate
+    S_estimate = S_estimate + Q;    
+
     % calculate state-observation cross-covariance
     Pxy = zeros(numel(x), numel(z_estimate));
     for j=1:numel(Xwc)
