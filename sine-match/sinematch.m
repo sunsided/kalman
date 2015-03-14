@@ -71,7 +71,7 @@ for i=1:numel(time_vector);
 % TODO: add measurement noise Q_t to Sy
     
     % calculate state-observation cross-covariance
-    Pxy = zeros(numel(x), numel(z));
+    Pxy = zeros(numel(x), numel(z_estimate));
     for j=1:numel(Xwc)
         Pxy = Pxy + Xwc(j)*(X(:,j)-x_prior)*(Z(:,j)-z_estimate)';
     end
