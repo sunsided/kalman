@@ -33,8 +33,9 @@ function [my, sigma, Y, wm, wc] = unscented(fun, my, sigma, varargin)
     lambda = alpha^2*(n+kappa) - n;
 
     % calculate matrix square root of adjusted covariance matrix
+    gamma = sqrt(n+lambda);
 % TODO: compute via diagonalization
-    S_adjusted = alpha*sqrt(n+kappa) * sqrtm(sigma);
+    S_adjusted = gamma * sqrtm(sigma);
         
     % calculate sigma points
     X = nan(n,2*n+1);      % prepare array of vectors
