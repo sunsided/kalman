@@ -57,7 +57,7 @@ for i=1:numel(time_vector);
 
     % define the nonlinear observation function
     % note this is time dependent
-    observation_fun = @(x) x(3)*sin(2*pi*x(1)*T+x(2))+x(4);
+    observation_fun = @(x) x(3)*sin(2*pi*x(1)*t+x(2))+x(4);
     
     % time update - propagate state
     [x_prior, P_prior, X, Xwm, Xwc] = unscented(state_transition_fun, ...
