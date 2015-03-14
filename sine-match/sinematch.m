@@ -23,8 +23,8 @@ ylabel('a*sin(\omegat+\phi)+b');
 % "it it is easier to approximate
 %  a probability distribution than it is to approximate
 %  an arbitrary nonlinear function or transformation"
-% J. K. Uhlmann, ï¿½Simultaneous map building and localization for
-% real time applications,ï¿½ transfer thesis, Univ. Oxford, Oxford, U.K.,
+% J. K. Uhlmann, “Simultaneous map building and localization for
+% real time applications,” transfer thesis, Univ. Oxford, Oxford, U.K.,
 % 1994.
 
 % set initial state estimate
@@ -58,16 +58,16 @@ for i=1:numel(time_vector);
     
 % TODO: add prediction noise R_t to P_priori
     
-    % determine what we should observe
-    [y, Py, Y, Ywm, Ywc] = unscented(observation_fun, x_priori, P_priori, 'n_out', 1);
+    % predict observations using the a-priori state
+    [z, S, Z, Zwm, Zwc] = unscented(observation_fun, x_priori, P_priori, 'n_out', 1);
     
 % TODO: add measurement noise Q_t to Sy
     
-    % calculate cross-covariance
+    % calculate state-observation cross-covariance
     Pxy = zeros(numel(x), numel(z));
     for j=1:numel(Ywc)
         % TODO: there be dragons
-        Pxy = Pxy + Ywc(j)*(X(:,i)-my)*(Y(:,i)-my)';
+        Pxy = Pxy + Zwc(j)*(X(:,i)-x_priori)*(S(:,i)-z)';
     end
     
 end
