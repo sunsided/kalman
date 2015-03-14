@@ -2,6 +2,7 @@ real_frequency = .42;         % Hz
 real_phase     = deg2rad(15); % radians
 real_amplitude = 2;           % <scalar>
 real_offset    = -5;          % <scalar>
+real_carrier_freq = 0.0125;   % Hz
 
 T_start        = 0;           % seconds
 T_end          = 20;          % seconds
@@ -12,7 +13,7 @@ time_vector = linspace(T_start, T_end, N_samples);
  
 % generate the data vector
 real_omega = 2*pi*real_frequency;
-real_data = real_amplitude*sin(real_omega*time_vector+real_phase) + real_offset;
+real_data = real_amplitude*sin(real_omega*time_vector+real_phase) + real_offset + cos(2*pi*real_carrier_freq*time_vector);
 
 % generate the output buffers
 observed_data = nan(size(real_data));
@@ -27,8 +28,8 @@ ylabel('a*sin(\omegat+\phi)+b');
 % "it it is easier to approximate
 %  a probability distribution than it is to approximate
 %  an arbitrary nonlinear function or transformation"
-% J. K. Uhlmann, “Simultaneous map building and localization for
-% real time applications,” transfer thesis, Univ. Oxford, Oxford, U.K.,
+% J. K. Uhlmann, ï¿½Simultaneous map building and localization for
+% real time applications,ï¿½ transfer thesis, Univ. Oxford, Oxford, U.K.,
 % 1994.
 
 % set initial state estimate
