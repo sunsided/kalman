@@ -44,7 +44,7 @@ function [my, sigma, Y, wm, wc] = unscented(fun, my, sigma, varargin)
         
     % calculate sigma points
     X = nan(n,2*n+1);      % prepare array of vectors
-    X(:,1) = my;            % bootstrap first sigma point
+    X(:,1) = my;           % bootstrap first sigma point
     for i=1:n
         X(:,i+1)   = my + S_adjusted(:,i);
         X(:,i+n+1) = my - S_adjusted(:,i);
