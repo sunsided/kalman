@@ -23,8 +23,8 @@ ylabel('a*sin(\omegat+\phi)+b');
 % "it it is easier to approximate
 %  a probability distribution than it is to approximate
 %  an arbitrary nonlinear function or transformation"
-% J. K. Uhlmann, ï¿½Simultaneous map building and localization for
-% real time applications,ï¿½ transfer thesis, Univ. Oxford, Oxford, U.K.,
+% J. K. Uhlmann, “Simultaneous map building and localization for
+% real time applications,” transfer thesis, Univ. Oxford, Oxford, U.K.,
 % 1994.
 
 % set initial state estimate
@@ -76,5 +76,14 @@ for i=1:numel(time_vector);
         % TODO: there be dragons
         Pxy = Pxy + Xwc(j)*(X(:,j)-x_prior)*(Z(:,j)-z_estimate)';
     end
+    
+    % calculate Kalman gain
+    K = Pxy/S_estimate; % note the inversion of S!
+    
+    % obtain observation
+    z = real_data(i); % ... easy way out, should use more fake data here
+    
+    % measurement update
+    x_posterior = x_prior + K*(z - z_estimate);
     
 end
