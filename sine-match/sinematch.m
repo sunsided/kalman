@@ -41,7 +41,7 @@ for i=1:numel(time_vector);
     % obtain current time and time delta to last step
     t = time_vector(i);
     if i > 1
-        T = t(i)-t(i-1);
+        T = t-time_vector(i-1);
     else
         T = 0;
     end
@@ -85,5 +85,10 @@ for i=1:numel(time_vector);
     
     % measurement update
     x_posterior = x_prior + K*(z - z_estimate);
+    P_posterior = P_prior + K*S_estimate*K';
+    
+    % pass variables around
+    x = x_posterior;
+    P = P_posterior;
     
 end
