@@ -26,8 +26,8 @@ ylabel('a*sin(\omegat+\phi)+b');
 % "it it is easier to approximate
 %  a probability distribution than it is to approximate
 %  an arbitrary nonlinear function or transformation"
-% J. K. Uhlmann, ï¿½Simultaneous map building and localization for
-% real time applications,ï¿½ transfer thesis, Univ. Oxford, Oxford, U.K.,
+% J. K. Uhlmann, “Simultaneous map building and localization for
+% real time applications,” transfer thesis, Univ. Oxford, Oxford, U.K.,
 % 1994.
 
 % set initial state estimate
@@ -40,7 +40,7 @@ x = [1;  % frequency [Hz]
 P = 1000*diag(ones(size(x)));
  
 % define additive state covariance prediction noise
-R = ones(size(P_prior))*0.1;
+R = ones(size(P))*0.1;
 
 % define additive measurement covariance prediction noise
 Q = ones(size(1))*0.1;
@@ -79,7 +79,7 @@ for i=1:numel(time_vector);
                                             'n_out', 1);
     
     % add measurement noise Q to S_estimate
-    S_estimate = S_estimate + Q;    
+    S_estimate = S_estimate + Q;
 
     % calculate state-observation cross-covariance
     Pxy = zeros(numel(x), numel(z_estimate));
