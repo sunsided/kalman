@@ -13,6 +13,9 @@ function [my, sigma, Y, wm, wc] = unscented(fun, my, sigma, varargin)
     defaultAlpha = 1; % 1e-3 is typical, 1 results in regular unscented transform
     defaultBeta = 2;
     
+    % number of output variables
+    defaultNout = 0;
+    
     % parse inputs
     p = inputParser;
     addRequired(p, 'fun', @(fh) isa(fh,'function_handle'));
@@ -21,6 +24,7 @@ function [my, sigma, Y, wm, wc] = unscented(fun, my, sigma, varargin)
     addOptional(p, 'kappa', defaultKappa, @isnumeric);
     addOptional(p, 'alpha', defaultAlpha, @isnumeric);
     addOptional(p, 'beta', defaultBeta, @isnumeric);
+    addOptional(p, 'n_out', defaultNout, @isnumeric);
     parse(p, fun, my, sigma, varargin{:});   
     
     % obtain the number of states
@@ -30,6 +34,7 @@ function [my, sigma, Y, wm, wc] = unscented(fun, my, sigma, varargin)
     kappa = p.Results.kappa;
     alpha = p.Results.alpha;
     beta = p.Results.beta;
+    n_out = p.Results.n_out;
     lambda = alpha^2*(n+kappa) - n;
 
     % calculate matrix square root of adjusted covariance matrix
@@ -45,8 +50,18 @@ function [my, sigma, Y, wm, wc] = unscented(fun, my, sigma, varargin)
         X(:,i+n+1) = my - S_adjusted(:,i);
     end
     
+    % prepare the array for the sigma points. 
+    % Since we can't determine it from the state vector alone (the 
+    % evaluation function might return a vector of any dimension) we use
+    % the hint given in the function call or fall back to a dynamically 
+    % growing array if no hint was given.
+    if n_out ~= defaultNout
+        Y = nan(n_out, size(X,2));
+    else
+        Y = [];
+    end
+    
     % transform the calculated sigma points
-    Y = nan(size(X));
     for i=1:size(X,2)
         Y(:,i) = fun(X(:,i));
     end
