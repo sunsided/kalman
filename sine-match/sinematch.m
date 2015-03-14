@@ -64,7 +64,7 @@ for i=1:numel(time_vector);
 % TODO: add measurement noise Q_t to Sy
     
     % calculate cross-covariance
-    Pxy = zeros(size(P));
+    Pxy = zeros(numel(x), numel(z));
     for j=1:numel(Ywc)
         % TODO: there be dragons
         Pxy = Pxy + Ywc(j)*(X(:,i)-my)*(Y(:,i)-my)';
