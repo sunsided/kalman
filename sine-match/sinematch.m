@@ -17,7 +17,8 @@ real_data = real_amplitude*sin(real_omega*time_vector+real_phase) + real_offset 
 
 % generate the output buffers
 observed_data = nan(size(real_data));
-estimated_data = nan(size(real_data));
+estimated_output = nan(size(real_data));
+estimated_state = nan(4, numel(real_data));
 
 % plot the real data
 close all;
@@ -28,8 +29,8 @@ ylabel('a*sin(\omegat+\phi)+b');
 % "it it is easier to approximate
 %  a probability distribution than it is to approximate
 %  an arbitrary nonlinear function or transformation"
-% J. K. Uhlmann, “Simultaneous map building and localization for
-% real time applications,” transfer thesis, Univ. Oxford, Oxford, U.K.,
+% J. K. Uhlmann, ï¿½Simultaneous map building and localization for
+% real time applications,ï¿½ transfer thesis, Univ. Oxford, Oxford, U.K.,
 % 1994.
 
 % set initial state estimate
@@ -56,13 +57,8 @@ Q = ones(size(1))*z_sigma;
 h = waitbar(0, 'Simulating ...');
 for i=1:N_samples;
    
-    % obtain current time and time delta to last step
+    % obtain current time
     t = time_vector(i);
-    if i > 1
-        T = t-time_vector(i-1);
-    else
-        T = 0;
-    end
         
     % define the nonlinear state transition function
     state_transition_fun = @(x) x;
@@ -89,7 +85,7 @@ for i=1:N_samples;
     
     if mod(i,floor(10*rand(1))) ~= 0
         % pass variables around
-        estimated_data(i) = z_estimate;
+        estimated_output(i) = z_estimate;
         x = x_prior;
         P = P_prior;
     else
@@ -114,11 +110,14 @@ for i=1:N_samples;
         P_posterior = P_prior - K*S_estimate*K';
 
         % pass variables around
-        estimated_data(i) = observation_fun(x_posterior);
+        estimated_output(i) = observation_fun(x_posterior);
         observed_data(i) = z;
         x = x_posterior;
         P = P_posterior;
     end
+
+    % store estimated state
+    estimated_state(:,i) = x;
     
     % update the progress bar
     waitbar(i / N_samples, h);
@@ -130,6 +129,32 @@ delete(h);
 
 % plot the estimated data
 hold all;
-valid = ~isnan(estimated_data);
-plot(time_vector(valid), estimated_data(valid), 'r', 'LineWidth', 1);
+valid = ~isnan(estimated_output);
+plot(time_vector(valid), estimated_output(valid), 'r', 'LineWidth', 1);
 plot(time_vector(valid), observed_data(valid), 'm+');
+
+% plot the state estimate
+figure;
+subplot(4,1,1);
+plot(time_vector, ones(1,N_samples)*real_frequency, 'k'); hold on;
+plot(time_vector, estimated_state(1,:), 'r');
+xlabel('t [s]');
+ylabel('f [Hz]');
+
+subplot(4,1,2);
+plot(time_vector, ones(1,N_samples)*real_phase, 'k'); hold on;
+plot(time_vector, estimated_state(2,:), 'r');
+xlabel('t [s]');
+ylabel('\phi [rad]');
+
+subplot(4,1,3);
+plot(time_vector, ones(1,N_samples)*real_amplitude, 'k'); hold on;
+plot(time_vector, estimated_state(3,:), 'r');
+xlabel('t [s]');
+ylabel('amplitude');
+
+subplot(4,1,4);
+plot(time_vector, real_offset + cos(2*pi*real_carrier_freq*time_vector), 'k'); hold on;
+plot(time_vector, estimated_state(4,:), 'r');
+xlabel('t [s]');
+ylabel('offset');
