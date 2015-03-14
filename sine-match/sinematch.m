@@ -23,8 +23,8 @@ ylabel('a*sin(\omegat+\phi)+b');
 % "it it is easier to approximate
 %  a probability distribution than it is to approximate
 %  an arbitrary nonlinear function or transformation"
-% J. K. Uhlmann, “Simultaneous map building and localization for
-% real time applications,” transfer thesis, Univ. Oxford, Oxford, U.K.,
+% J. K. Uhlmann, ï¿½Simultaneous map building and localization for
+% real time applications,ï¿½ transfer thesis, Univ. Oxford, Oxford, U.K.,
 % 1994.
 
 % set initial state estimate
@@ -54,12 +54,19 @@ for i=1:numel(time_vector);
     observation_fun = @(x) x(3)*sin(2*pi*x(1)*T+x(2))+x(4);
     
     % time update - propagate state
-    [x_priori, P_priori, X, Xwm, Xwc] = unscented(state_transition_fun, x, P, 'n_out', 4);
+    [x_prior, P_prior, X, Xwm, Xwc] = unscented(state_transition_fun, ...
+                                                x, P, ...
+                                                'n_out', 4);
     
-% TODO: add prediction noise R_t to P_priori
+% TODO: add prediction noise R_t to P_prior
     
     % predict observations using the a-priori state
-    [z, S, Z, Zwm, Zwc] = unscented(observation_fun, x_priori, P_priori, 'n_out', 1);
+    % Note that the weights calculated by this function are the very
+    % same as calculated above since we're still operating on 
+    % the state vector (i.e. dimensionality didn't change).
+    [z_estimate, S_estimate, Z] = unscented(observation_fun, ...
+                                            x_prior, P_prior, ...
+                                            'n_out', 1);
     
 % TODO: add measurement noise Q_t to Sy
     
@@ -67,7 +74,7 @@ for i=1:numel(time_vector);
     Pxy = zeros(numel(x), numel(z));
     for j=1:numel(Ywc)
         % TODO: there be dragons
-        Pxy = Pxy + Zwc(j)*(X(:,i)-x_priori)*(S(:,i)-z)';
+        Pxy = Pxy + Zwc(j)*(X(:,i)-x_prior)*(S(:,i)-z)';
     end
     
 end
