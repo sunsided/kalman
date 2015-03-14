@@ -77,7 +77,7 @@ for i=1:numel(time_vector);
     % add prediction noise
     P_prior = P_prior + R;
     
-    if mod(i,5) ~= 0
+    if mod(i,floor(10*rand(1))) ~= 0
         % pass variables around
         x = x_prior;
         P = P_prior;
