@@ -14,6 +14,9 @@ time_vector = linspace(T_start, T_end, N_samples);
 real_omega = 2*pi*real_frequency;
 real_data = real_amplitude*sin(real_omega*time_vector+real_phase) + real_offset;
 
+% generate the output buffer
+estimated_data = nan(size(real_data));
+
 % plot the real data
 close all;
 plot(time_vector, real_data);
@@ -95,7 +98,11 @@ for i=1:numel(time_vector);
     P_posterior = P_prior - K*S_estimate*K';
     
     % pass variables around
+    estimated_data(i) = z_estimate;
     x = x_posterior;
     P = P_posterior;
-    
-end
+ end
+
+% plot the estimated data
+hold all;
+plot(time_vector, estimated_data, 'r');
