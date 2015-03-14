@@ -121,5 +121,5 @@ for i=1:numel(time_vector);
 % plot the estimated data
 hold all;
 valid = ~isnan(estimated_data);
-plot(time_vector(valid), estimated_data(valid), 'r');
+plot(time_vector(valid), estimated_data(valid), 'r', 'LineWidth', 2);
 plot(time_vector(valid), observed_data(valid), 'm+');
