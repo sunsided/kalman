@@ -49,7 +49,7 @@ x = [
 P = 100*diag(ones(size(x)));
  
 % define additive state covariance prediction noise
-R = 1e0 * ...
+R = 1e-1 * ...
     [deg2rad(10) 0  0  0;        % angle
      0  1 0  0;                  % frequency
      0  0  .01 0;                % amplitude
@@ -57,7 +57,8 @@ R = 1e0 * ...
 
 % define additive measurement covariance prediction noise
 z_sigma = 0.05;
-Q = ones(size(1))*z_sigma;
+Q = [z_sigma 0;
+     0 1e-2];
 
 % simulate
 h = waitbar(0, 'Simulating ...');
@@ -77,7 +78,8 @@ for i=1:N_samples;
 
     % define the nonlinear observation function
     % note this is time dependent
-    observation_fun = @(x) x(3)*sin(x(1) + 2*pi*x(2)*T)+x(4);
+    observation_fun = @(x) [x(3)*sin(x(1) + 2*pi*x(2)*T)+x(4);  % expected output
+                            real_carrier(i)];                   % expected carrier
    
     % time update - propagate state
     [x_prior, P_prior, X, Xwm, Xwc] = unscented(state_transition_fun, ...
@@ -99,14 +101,14 @@ for i=1:N_samples;
     % the state vector (i.e. dimensionality didn't change).
     [z_estimate, S_estimate, Z] = unscented(observation_fun, ...
                                             x_prior, P_prior, ...
-                                            'n_out', 1, ...
+                                            'n_out', 2, ...
                                       	    'alpha', alpha, ...
                                             'beta', beta, ...
                                             'kappa', kappa);
     
     if mod(i,floor(10*rand(1))) ~= 0
         % pass variables around
-        estimated_output(i) = z_estimate;
+        estimated_output(i) = z_estimate(1);
         x = x_prior;
         P = P_prior;
     else
@@ -124,7 +126,8 @@ for i=1:N_samples;
 
         % obtain observation
         z_error = z_sigma*randn(1);
-        z = real_data(i) + z_error;
+        z = [real_data(i) + z_error;
+             real_carrier(i)];
 
         % measurement update
         x_posterior = x_prior + K*(z - z_estimate);
@@ -132,8 +135,8 @@ for i=1:N_samples;
 
         % pass variables around
         z_posterior = observation_fun(x_posterior);
-        estimated_output(i) = z_posterior;
-        observed_data(i) = z;
+        estimated_output(i) = z_posterior(1);
+        observed_data(i) = z(1);
         x = x_posterior;
         P = P_posterior;
     end
