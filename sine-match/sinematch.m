@@ -39,20 +39,20 @@ alpha = 1;
 beta = 2;
 
 % set initial state estimate
-x = [1;  % frequency [Hz]
+x = [.5;  % frequency [Hz]
      0;  % phase [rad]
      1;  % amplitude [<scalar>]
-     0]; % offset [<scalar>]
+     -2]; % offset [<scalar>]
  
 % set initial state covariance
 P = 100*diag(ones(size(x)));
  
 % define additive state covariance prediction noise
-R = 1 * ...
-    [1 0 0    0;      % frequency
-     0 1 0    0;      % phase
-     0 0 .01  0;      % amplitude
-     0 0 0    0.01];  % offset
+R = 1e-1 * ...
+    [1 0  0  0;      % frequency
+     0  1 0  0;      % phase
+     0  0  .01 0;      % amplitude
+     0  0  0  .10];    % offset
 
 % define additive measurement covariance prediction noise
 z_sigma = 0.05;
@@ -79,6 +79,9 @@ for i=1:N_samples;
                                                 'alpha', alpha, ...
                                                 'beta', beta, ...
                                                 'kappa', kappa);
+
+    % "enforce" symmetry
+    % P_prior = (.5*P_prior) + (.5*P_prior');
                                             
     % add prediction noise
     P_prior = P_prior + R;
