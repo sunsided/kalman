@@ -17,9 +17,9 @@ real_carrier = cos(2*pi*real_carrier_freq*time_vector);
 real_data = real_amplitude*sin(real_omega*time_vector+real_phase) + real_offset + real_carrier;
 
 % generate the output buffers
-observed_data = nan(size(real_data));
-estimated_output = nan(size(real_data));
-estimated_state = nan(4, numel(real_data));
+observed_data = nan(1, N_samples);
+estimated_output = nan(1, N_samples);
+estimated_state = nan(4, N_samples);
 
 % plot the real data
 close all;
@@ -121,7 +121,8 @@ for i=1:N_samples;
         P_posterior = P_prior - K*S_estimate*K';
 
         % pass variables around
-        estimated_output(i) = observation_fun(x_posterior);
+        z_posterior = observation_fun(x_posterior);
+        estimated_output(i) = z_posterior;
         observed_data(i) = z;
         x = x_posterior;
         P = P_posterior;
