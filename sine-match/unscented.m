@@ -9,8 +9,8 @@ function [my, sigma, Y, wm, wc] = unscented(fun, my, sigma, varargin)
     % default values
     % http://ais.informatik.uni-freiburg.de/teaching/ws12/mapping/pdf/slam05-ukf.pdf
     % http://ei.uni-paderborn.de/fileadmin/Elektrotechnik/FG-NTH/http/download/estimation.pdf
-    defaultKappa = 1;
-    defaultAlpha = 1; % 1e-3 is typical, 1 results in regular unscented transform
+    defaultKappa = 0;
+    defaultAlpha = 1e-3; % is given as typical, 1 results in regular unscented transform
     defaultBeta = 2;
     
     % number of output variables
@@ -21,8 +21,8 @@ function [my, sigma, Y, wm, wc] = unscented(fun, my, sigma, varargin)
     addRequired(p, 'fun', @(fh) isa(fh,'function_handle'));
     addRequired(p, 'my', @isvector);
     addRequired(p, 'sigma', @ismatrix);
-    addOptional(p, 'kappa', defaultKappa, @isnumeric);
-    addOptional(p, 'alpha', defaultAlpha, @isnumeric);
+    addOptional(p, 'kappa', defaultKappa, @(x) isnumeric(x) && (x >= 0));
+    addOptional(p, 'alpha', defaultAlpha, @(x) isnumeric(x) && (x > 0) && (x <= 1));
     addOptional(p, 'beta', defaultBeta, @isnumeric);
     addOptional(p, 'n_out', defaultNout, @isnumeric);
     parse(p, fun, my, sigma, varargin{:});   
