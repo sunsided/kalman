@@ -46,7 +46,7 @@ x = [
 P = 100*diag(ones(size(x)));
  
 % define additive state covariance prediction noise
-Q = 1e-2 * ...
+Q = 1e-1 * ...
     [(2*pi*deg2rad(1)*T) 0  0;        % angle
      0  (2*pi*deg2rad(1)) 0;          % angular velocity
      0  0  .001];                      % amplitude
@@ -54,7 +54,7 @@ Q = 1e-2 * ...
 
 % define additive measurement covariance prediction noise
 z_sigma = 0.25;
-R = z_sigma*1e-1;
+R = z_sigma*1e-2;
 
 % simulate
 h = waitbar(0, 'Simulating ...');
