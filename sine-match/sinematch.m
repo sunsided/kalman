@@ -28,8 +28,8 @@ ylabel('a*sin(\omegat+\phi)');
 % "it it is easier to approximate
 %  a probability distribution than it is to approximate
 %  an arbitrary nonlinear function or transformation"
-% J. K. Uhlmann, �Simultaneous map building and localization for
-% real time applications,� transfer thesis, Univ. Oxford, Oxford, U.K.,
+% J. K. Uhlmann, "Simultaneous map building and localization for
+% real time applications" transfer thesis, Univ. Oxford, Oxford, U.K.,
 % 1994.
 
 kappa = 1;
