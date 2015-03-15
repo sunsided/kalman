@@ -1,31 +1,29 @@
 real_frequency = .42;         % Hz
 real_phase     = deg2rad(15); % radians
 real_amplitude = 2;           % <scalar>
-real_offset    = -5;          % <scalar>
-real_carrier_freq = 0.0125;   % Hz
 
 T_start        = 0;           % seconds
 T_end          = 20;          % seconds
-N_samples      = 500;         % <number of samples>
+N_samples      = 500;        % <number of samples>
 
 % generate the time vector
 time_vector = linspace(T_start, T_end, N_samples);
+T = time_vector(2) - time_vector(1);
  
 % generate the data vector
 real_omega = 2*pi*real_frequency;
-real_carrier = cos(2*pi*real_carrier_freq*time_vector);
-real_data = real_amplitude*sin(real_omega*time_vector+real_phase) + real_offset + real_carrier;
+real_data = real_amplitude*sin(real_omega*time_vector+real_phase);
 
 % generate the output buffers
 observed_data = nan(1, N_samples);
 estimated_output = nan(1, N_samples);
-estimated_state = nan(4, N_samples);
+estimated_state = nan(3, N_samples);
 
 % plot the real data
 close all;
 plot(time_vector, real_data, 'k');
 xlabel('t [s]');
-ylabel('a*sin(\omegat+\phi)+b');
+ylabel('a*sin(\omegat+\phi)');
 
 % "it it is easier to approximate
 %  a probability distribution than it is to approximate
@@ -41,24 +39,22 @@ beta = 2;
 % set initial state estimate
 x = [
      0;   % angle [rad]    
-     .5;  % frequency [Hz]
-     1;   % amplitude [<scalar>]
-     -2]; % offset [<scalar>]
+     2*pi*.5;  % angular velocity
+     1];   % amplitude [<scalar>]
  
 % set initial state covariance
 P = 100*diag(ones(size(x)));
  
 % define additive state covariance prediction noise
-R = 1e-1 * ...
-    [deg2rad(10) 0  0  0;        % angle
-     0  1 0  0;                  % frequency
-     0  0  .01 0;                % amplitude
-     0  0  0  .10];              % offset
+Q = 1e-1 * ...
+    [deg2rad(2*pi*10*T)^2 0  0;        % angle
+     0  1 0;                  % angular velocity
+     0  0  .001];                % amplitude
+
 
 % define additive measurement covariance prediction noise
 z_sigma = 0.05;
-Q = [z_sigma 0;
-     0 1e-2];
+R = z_sigma*1e-2;
 
 % simulate
 h = waitbar(0, 'Simulating ...');
@@ -66,20 +62,13 @@ for i=1:N_samples;
    
     % obtain current time and time delta to last step
     t = time_vector(i);
-    if i > 1
-        T = t-time_vector(i-1);
-    else
-        T = 0;
-    end
         
     % define the nonlinear state transition function
-    state_transition_fun = @(x) [x(1) + 2*pi*x(2)*T;
-                                 x(2); x(3); x(4)];
+    state_transition_fun = @(x) [x(1) + abs(x(2))*T;
+                                 abs(x(2)); abs(x(3))];
 
     % define the nonlinear observation function
-    % note this is time dependent
-    observation_fun = @(x) [x(3)*sin(x(1) + 2*pi*x(2)*T)+x(4);  % expected output
-                            real_carrier(i)];                   % expected carrier
+    observation_fun = @(x) x(3)*sin(x(1));
    
     % time update - propagate state
     [x_prior, P_prior, X, Xwm, Xwc] = unscented(state_transition_fun, ...
@@ -93,7 +82,7 @@ for i=1:N_samples;
     % P_prior = (.5*P_prior) + (.5*P_prior');
                                             
     % add prediction noise
-    P_prior = P_prior + R;
+    P_prior = P_prior + Q;
         
     % predict observations using the a-priori state
     % Note that the weights calculated by this function are the very
@@ -101,7 +90,7 @@ for i=1:N_samples;
     % the state vector (i.e. dimensionality didn't change).
     [z_estimate, S_estimate, Z] = unscented(observation_fun, ...
                                             x_prior, P_prior, ...
-                                            'n_out', numel(diag(Q)), ...
+                                            'n_out', numel(diag(R)), ...
                                       	    'alpha', alpha, ...
                                             'beta', beta, ...
                                             'kappa', kappa);
@@ -113,7 +102,7 @@ for i=1:N_samples;
         P = P_prior;
     else
         % add measurement noise Q to S_estimate
-        S_estimate = S_estimate + Q;
+        S_estimate = S_estimate + R;
 
         % calculate state-observation cross-covariance
         Pxy = zeros(numel(x), numel(z_estimate));
@@ -126,8 +115,7 @@ for i=1:N_samples;
 
         % obtain observation
         z_error = z_sigma*randn(1);
-        z = [real_data(i) + z_error;
-             real_carrier(i)];
+        z = real_data(i) + z_error;
 
         % measurement update
         x_posterior = x_prior + K*(z - z_estimate);
@@ -160,26 +148,21 @@ plot(time_vector(valid), observed_data(valid), 'm+');
 
 % plot the state estimate
 figure;
-subplot(4,1,1);
-plot(time_vector, ones(1,N_samples)*real_frequency, 'k'); hold on;
+subplot(3,1,1);
+T = time_vector(2)-time_vector(1);
+plot(time_vector, cumsum(ones(1,N_samples)*2*pi*real_frequency*T), 'k'); hold on;
 plot(time_vector, estimated_state(1,:), 'r');
 xlabel('t [s]');
 ylabel('\phi [rad]');
 
-subplot(4,1,2);
-plot(time_vector, ones(1,N_samples)*real_phase, 'k'); hold on;
-plot(time_vector, estimated_state(2,:), 'r');
+subplot(3,1,2);
+plot(time_vector, ones(1,N_samples)*real_frequency, 'k'); hold on;
+plot(time_vector, estimated_state(2,:)/2/pi, 'r');
 xlabel('t [s]');
 ylabel('f [Hz]');
 
-subplot(4,1,3);
+subplot(3,1,3);
 plot(time_vector, ones(1,N_samples)*real_amplitude, 'k'); hold on;
 plot(time_vector, estimated_state(3,:), 'r');
 xlabel('t [s]');
 ylabel('amplitude');
-
-subplot(4,1,4);
-plot(time_vector, real_offset + cos(2*pi*real_carrier_freq*time_vector), 'k'); hold on;
-plot(time_vector, estimated_state(4,:), 'r');
-xlabel('t [s]');
-ylabel('offset');
