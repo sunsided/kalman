@@ -131,8 +131,15 @@ for i=1:N_samples;
         observed_data(i) = z(1);
         x = x_posterior;
         P = P_posterior;
+        
+        % clean up
+        clearvars P_posterior x_posterior z_error z K Pxy j z_posterior;
     end
 
+    % clean up
+    clearvars P_prior x_prior X Xwm Xwc z_estimate S_estimate Z ...
+              constraints observation_fun state_transition_fun;
+    
     % store estimated state
     estimated_state(:,i) = x;
     
@@ -148,7 +155,7 @@ delete(h);
 hold all;
 valid = ~isnan(estimated_output);
 plot(time_vector(valid), estimated_output(valid), 'r', 'LineWidth', 1);
-plot(time_vector(valid), observed_data(valid), 'm+');
+plot(time_vector, observed_data, 'm+');
 legend('signal', 'estimated signal', 'observations', 'Location', 'NorthEast');
 
 % plot the state estimate
@@ -171,3 +178,6 @@ plot(time_vector, ones(1,N_samples)*real_amplitude, 'k'); hold on;
 plot(time_vector, estimated_state(3,:), 'r');
 xlabel('t [s]');
 ylabel('amplitude');
+
+% clean up
+clearvars h i valid;
