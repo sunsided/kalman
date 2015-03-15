@@ -25,11 +25,15 @@ function [my, sigma, Y, wm, wc] = unscented(fun, my, sigma, varargin)
     addOptional(p, 'alpha', defaultAlpha, @(x) isnumeric(x) && (x > 0) && (x <= 1));
     addOptional(p, 'beta', defaultBeta, @isnumeric);
     addOptional(p, 'n_out', defaultNout, @isnumeric);
+    addOptional(p, 'constraint', nan, @(fh) isa(fh,'function_handle'));
     parse(p, fun, my, sigma, varargin{:});   
     
     % obtain the number of states
     n = numel(my);
 
+    % determine constraint function
+    constraint = p.Results.constraint;
+    
     % determine free parameters
     kappa = p.Results.kappa;
     alpha = p.Results.alpha;
@@ -64,7 +68,17 @@ function [my, sigma, Y, wm, wc] = unscented(fun, my, sigma, varargin)
     % transform the calculated sigma points
     for i=1:size(X,2)
         Y(:,i) = fun(X(:,i));
+        
+        % apply constraints to the transformed sigma points
+        % as described in "Constrained State Estimation Using the 
+        % Unscented Kalman Filter" by Kandepu, Imsland and Foss
+        if isa(constraint,'function_handle')
+            Y(:,i) = constraint(Y(:,i));
+        end
     end
+    
+    % make sure we're not doing anything stupid below
+    clearvars X;
     
     % calculate weights for expectation determination
     wm0 = lambda/(n+lambda); % = 1 - n/(alpha^2*(n+kappa))
