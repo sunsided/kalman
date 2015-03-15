@@ -34,6 +34,10 @@ ylabel('a*sin(\omegat+\phi)+b');
 % real time applications,� transfer thesis, Univ. Oxford, Oxford, U.K.,
 % 1994.
 
+kappa = 1;
+alpha = 1;
+beta = 2;
+
 % set initial state estimate
 x = [1;  % frequency [Hz]
      0;  % phase [rad]
@@ -71,7 +75,10 @@ for i=1:N_samples;
     % time update - propagate state
     [x_prior, P_prior, X, Xwm, Xwc] = unscented(state_transition_fun, ...
                                                 x, P, ...
-                                                'n_out', 4);
+                                                'n_out', 4, ...
+                                                'alpha', alpha, ...
+                                                'beta', beta, ...
+                                                'kappa', kappa);
                                             
     % add prediction noise
     P_prior = P_prior + R;
@@ -82,7 +89,10 @@ for i=1:N_samples;
     % the state vector (i.e. dimensionality didn't change).
     [z_estimate, S_estimate, Z] = unscented(observation_fun, ...
                                             x_prior, P_prior, ...
-                                            'n_out', 1);
+                                            'n_out', 1, ...
+                                      	    'alpha', alpha, ...
+                                            'beta', beta, ...
+                                            'kappa', kappa);
     
     if mod(i,floor(10*rand(1))) ~= 0
         % pass variables around
