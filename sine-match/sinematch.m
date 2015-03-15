@@ -39,20 +39,21 @@ alpha = 1;
 beta = 2;
 
 % set initial state estimate
-x = [.5;  % frequency [Hz]
-     0;  % phase [rad]
-     1;  % amplitude [<scalar>]
+x = [
+     0;   % angle [rad]    
+     .5;  % frequency [Hz]
+     1;   % amplitude [<scalar>]
      -2]; % offset [<scalar>]
  
 % set initial state covariance
 P = 100*diag(ones(size(x)));
  
 % define additive state covariance prediction noise
-R = 1e-1 * ...
-    [1 0  0  0;      % frequency
-     0  1 0  0;      % phase
-     0  0  .01 0;      % amplitude
-     0  0  0  .10];    % offset
+R = 1e0 * ...
+    [deg2rad(10) 0  0  0;        % angle
+     0  1 0  0;                  % frequency
+     0  0  .01 0;                % amplitude
+     0  0  0  .10];              % offset
 
 % define additive measurement covariance prediction noise
 z_sigma = 0.05;
@@ -62,15 +63,21 @@ Q = ones(size(1))*z_sigma;
 h = waitbar(0, 'Simulating ...');
 for i=1:N_samples;
    
-    % obtain current time
+    % obtain current time and time delta to last step
     t = time_vector(i);
+    if i > 1
+        T = t-time_vector(i-1);
+    else
+        T = 0;
+    end
         
     % define the nonlinear state transition function
-    state_transition_fun = @(x) x;
+    state_transition_fun = @(x) [x(1) + 2*pi*x(2)*T;
+                                 x(2); x(3); x(4)];
 
     % define the nonlinear observation function
     % note this is time dependent
-    observation_fun = @(x) x(3)*sin(2*pi*x(1)*t+x(2))+x(4);
+    observation_fun = @(x) x(3)*sin(x(1) + 2*pi*x(2)*T)+x(4);
    
     % time update - propagate state
     [x_prior, P_prior, X, Xwm, Xwc] = unscented(state_transition_fun, ...
@@ -154,13 +161,13 @@ subplot(4,1,1);
 plot(time_vector, ones(1,N_samples)*real_frequency, 'k'); hold on;
 plot(time_vector, estimated_state(1,:), 'r');
 xlabel('t [s]');
-ylabel('f [Hz]');
+ylabel('\phi [rad]');
 
 subplot(4,1,2);
 plot(time_vector, ones(1,N_samples)*real_phase, 'k'); hold on;
 plot(time_vector, estimated_state(2,:), 'r');
 xlabel('t [s]');
-ylabel('\phi [rad]');
+ylabel('f [Hz]');
 
 subplot(4,1,3);
 plot(time_vector, ones(1,N_samples)*real_amplitude, 'k'); hold on;
