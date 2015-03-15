@@ -16,6 +16,9 @@ function [my, sigma, Y, wm, wc] = unscented(fun, my, sigma, varargin)
     % number of output variables
     defaultNout = 0;
     
+    % default constraint function
+    defaultConstraintFun = @(x) x;
+    
     % parse inputs
     p = inputParser;
     addRequired(p, 'fun', @(fh) isa(fh,'function_handle'));
@@ -25,7 +28,7 @@ function [my, sigma, Y, wm, wc] = unscented(fun, my, sigma, varargin)
     addOptional(p, 'alpha', defaultAlpha, @(x) isnumeric(x) && (x > 0) && (x <= 1));
     addOptional(p, 'beta', defaultBeta, @isnumeric);
     addOptional(p, 'n_out', defaultNout, @isnumeric);
-    addOptional(p, 'constraint', nan, @(fh) isa(fh,'function_handle'));
+    addOptional(p, 'constraint', defaultConstraintFun, @(fh) isa(fh,'function_handle'));
     parse(p, fun, my, sigma, varargin{:});   
     
     % obtain the number of states
@@ -72,9 +75,7 @@ function [my, sigma, Y, wm, wc] = unscented(fun, my, sigma, varargin)
         % apply constraints to the transformed sigma points
         % as described in "Constrained State Estimation Using the 
         % Unscented Kalman Filter" by Kandepu, Imsland and Foss
-        if isa(constraint,'function_handle')
-            Y(:,i) = constraint(Y(:,i));
-        end
+        Y(:,i) = constraint(Y(:,i));
     end
     
     % make sure we're not doing anything stupid below
