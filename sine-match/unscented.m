@@ -24,7 +24,7 @@ function [my, sigma, Y, wm, wc] = unscented(fun, my, sigma, varargin)
     addRequired(p, 'fun', @(fh) isa(fh,'function_handle'));
     addRequired(p, 'my', @isvector);
     addRequired(p, 'sigma', @ismatrix);
-    addOptional(p, 'kappa', defaultKappa, @(x) isnumeric(x) && (x >= 0));
+    addOptional(p, 'kappa', defaultKappa, @(x) isnumeric(x));
     addOptional(p, 'alpha', defaultAlpha, @(x) isnumeric(x) && (x > 0) && (x <= 1));
     addOptional(p, 'beta', defaultBeta, @isnumeric);
     addOptional(p, 'n_out', defaultNout, @isnumeric);
