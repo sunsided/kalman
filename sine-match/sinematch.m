@@ -47,9 +47,9 @@ P = 100*diag(ones(size(x)));
  
 % define additive state covariance prediction noise
 Q = 1e-1 * ...
-    [deg2rad(2*pi*10*T)^2 0  0;        % angle
-     0  1 0;                  % angular velocity
-     0  0  .001];                % amplitude
+    [(2*pi*deg2rad(10)*T)^2 0  0;        % angle
+     0  (2*pi*deg2rad(10))^2 0;          % angular velocity
+     0  0  .001];                        % amplitude
 
 
 % define additive measurement covariance prediction noise
@@ -59,14 +59,17 @@ R = z_sigma*1e-2;
 % simulate
 h = waitbar(0, 'Simulating ...');
 for i=1:N_samples;
-   
-    % obtain current time and time delta to last step
-    t = time_vector(i);
         
     % define the nonlinear state transition function
-    state_transition_fun = @(x) [x(1) + abs(x(2))*T;
-                                 abs(x(2)); abs(x(3))];
+    state_transition_fun = @(x) [x(1) + x(2)*T;
+                                 x(2); 
+                                 x(3)];
 
+	% constraint function
+    constraints = @(x) [max(0, x(1));
+                        max(0, min(x(2), 5*2*pi));  % between 0 .. 5 Hz
+                        max(0, x(3))];  
+                             
     % define the nonlinear observation function
     observation_fun = @(x) x(3)*sin(x(1));
    
@@ -76,7 +79,8 @@ for i=1:N_samples;
                                                 'n_out', numel(diag(P)), ...
                                                 'alpha', alpha, ...
                                                 'beta', beta, ...
-                                                'kappa', kappa);
+                                                'kappa', kappa, ...
+                                                'constraint', constraints);
 
     % "enforce" symmetry
     % P_prior = (.5*P_prior) + (.5*P_prior');
@@ -101,7 +105,7 @@ for i=1:N_samples;
         x = x_prior;
         P = P_prior;
     else
-        % add measurement noise Q to S_estimate
+        % add measurement noise
         S_estimate = S_estimate + R;
 
         % calculate state-observation cross-covariance
