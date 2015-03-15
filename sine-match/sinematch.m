@@ -13,7 +13,8 @@ time_vector = linspace(T_start, T_end, N_samples);
  
 % generate the data vector
 real_omega = 2*pi*real_frequency;
-real_data = real_amplitude*sin(real_omega*time_vector+real_phase) + real_offset + cos(2*pi*real_carrier_freq*time_vector);
+real_carrier = cos(2*pi*real_carrier_freq*time_vector);
+real_data = real_amplitude*sin(real_omega*time_vector+real_phase) + real_offset + real_carrier;
 
 % generate the output buffers
 observed_data = nan(size(real_data));
