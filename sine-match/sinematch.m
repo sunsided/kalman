@@ -6,7 +6,7 @@ real_carrier_freq = 0.0125;   % Hz
 
 T_start        = 0;           % seconds
 T_end          = 20;          % seconds
-N_samples      = 2000;        % <number of samples>
+N_samples      = 500;         % <number of samples>
 
 % generate the time vector
 time_vector = linspace(T_start, T_end, N_samples);
