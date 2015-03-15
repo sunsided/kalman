@@ -46,15 +46,15 @@ x = [
 P = 100*diag(ones(size(x)));
  
 % define additive state covariance prediction noise
-Q = 1e-1 * ...
-    [(2*pi*deg2rad(10)*T)^2 0  0;        % angle
-     0  (2*pi*deg2rad(10))^2 0;          % angular velocity
-     0  0  .001];                        % amplitude
+Q = 1e-2 * ...
+    [(2*pi*deg2rad(1)*T) 0  0;        % angle
+     0  (2*pi*deg2rad(1)) 0;          % angular velocity
+     0  0  .001];                      % amplitude
 
 
 % define additive measurement covariance prediction noise
-z_sigma = 0.05;
-R = z_sigma*1e-2;
+z_sigma = 0.25;
+R = z_sigma*1e-1;
 
 % simulate
 h = waitbar(0, 'Simulating ...');
@@ -68,7 +68,7 @@ for i=1:N_samples;
 	% constraint function
     constraints = @(x) [max(0, x(1));
                         max(0, min(x(2), 5*2*pi));  % between 0 .. 5 Hz
-                        max(0, x(3))];  
+                        max(0.5, x(3))];
                              
     % define the nonlinear observation function
     observation_fun = @(x) x(3)*sin(x(1));
