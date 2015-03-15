@@ -149,6 +149,7 @@ hold all;
 valid = ~isnan(estimated_output);
 plot(time_vector(valid), estimated_output(valid), 'r', 'LineWidth', 1);
 plot(time_vector(valid), observed_data(valid), 'm+');
+legend('signal', 'estimated signal', 'observations', 'Location', 'NorthEast');
 
 % plot the state estimate
 figure;
