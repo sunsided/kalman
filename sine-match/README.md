@@ -4,7 +4,7 @@ This example uses a constrained additive-noise scaled unscented Kalman filter in
 
 	y(t) = a*sin(b + 2*pi*c*T)
 
-that is, the state vector consists of frequency, phase, amplitude and offset.
+that is, the state vector consists of angle (phase), angular velocity and amplitude.
 
 ## Constraints
 
